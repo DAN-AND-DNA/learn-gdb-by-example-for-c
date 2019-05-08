@@ -9,7 +9,9 @@
 - [退出gdb](#退出gdb)
 - [为gdb进行编译](#为gdb进行编译)
 - [调试程序](#调试程序)
-- [调试core文件](#调试core文件)
+- [CoreDump简单概念](#CoreDump简单概念)
+- [产生CoreDump文件](#产生CoreDump文件)
+- [调试CoreDump文件](#调试CoreDump文件)
 
 
 ## 原理
@@ -47,7 +49,8 @@
 
     $ gdb -q
     (gdb) quit
-
+    
+    
 ## 为gdb进行编译
 
     为了获得调试信息，需要添加 CFLAGS=-g -o0 选项
@@ -56,21 +59,21 @@
 ## 调试程序
 
 ```c 
-    //boom.c
-    #include <stdio.h>
-    #include <unistd.h>
+//boom.c
+#include <stdio.h>
+#include <unistd.h>
 
-    void fun(void)
-    {
-         printf("hello\n");
-    }
+void fun(void)
+{
+    printf("hello\n");
+}
     
-    int main()
-    {
-        fun();
-        sleep(1000);
-        return 0;
-    }
+int main()
+{
+    fun();
+    sleep(1000);
+    return 0;
+}
 ```
 
 1 直接启动:
@@ -87,9 +90,6 @@
     Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
     (gdb)
    
-具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Invoking-GDB.html#Invoking-GDB)
- 
-
 2 调试正在运行的程序:
     
     $ ps ux | grep boom | grep -v 'grep' 
@@ -114,7 +114,14 @@
     0x00007f1e2185be10 in __nanosleep_nocancel () from /lib64/libc.so.6
     Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
     (gdb) 
+
+具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Invoking-GDB.html#Invoking-GDB)
+
+## CoreDump简单概念
+CoreDump即核心转储，是程序运行异常崩溃时，系统内核为该程序产生的内存、寄存器、运行栈等快照，并保存为一个二进制文件，可以利用该文件进行GDB调试，发现运行错误。
     
-## 调试core文件
+## 产生CoreDump文件    
+
+## 调试CoreDump文件
 
 
