@@ -12,16 +12,18 @@
 - [CoreDump简单概念](#CoreDump简单概念)
 - [产生CoreDump文件](#产生CoreDump文件)
 - [调试CoreDump文件](#调试CoreDump文件)
-- [调试CoreDump文件](#调试CoreDump文件)
 - [help命令](help命令)
 - [list命令](list命令)
 - [start命令](start命令)
+- [next命令](next命令)
+- [step命令](next命令)
+- [backtrace命令](backtrace命令)
 - [run命令](run命令)
 
 
 ## 原理
 断点功能一般是通过特定的内核信号实现的，gdb捕获该信号，定位目标程序停止的地址来判断断点是否成功触发。
-首先gdb fork()出来一个子进程，该子启动目标程序(通过ptrace() 和 exec())，
+首先gdb fork()出来一个子进程，该子进程启动目标程序(通过ptrace() 和 exec())，
 父进程捕获该子进程的所有的信号(通过ptrace() 和 wait())，当子进程收到信号时，子进程就会被挂起，直到父进程通知其继续运行(通过ptrace())
 
 ## 启动gdb
@@ -346,3 +348,64 @@ int main()
     Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
     (gdb) 
     
+## next命令
+简写为n，继续运行到下一个代码行，遇到函数则直接运行函数，例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) start
+    Temporary breakpoint 1 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 1, main () at /home/dan/work/learn_core/boom.c:10
+    10          int a = 0;
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) next
+    11          func();
+    (gdb) n
+    12          a++;
+    (gdb) 
+    13          return 0;
+    (gdb) 
+    14      }
+    (gdb) 
+    0x00007ffff730e3d5 in __libc_start_main () from /lib64/libc.so.6
+    (gdb) 
+    Single stepping until exit from function __libc_start_main,
+    which has no line number information.
+    here[Inferior 1 (process 6236) exited normally]
+    (gdb) 
+    
+    
+next num 可以指定连续运行的代码行数量，例如:  
+
+    (gdb) start
+    Temporary breakpoint 2 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 2, main () at /home/dan/work/learn_core/boom.c:10
+    10          int a = 0;
+    (gdb) n 3
+    13          return 0;
+    (gdb) 
