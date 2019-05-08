@@ -8,7 +8,9 @@
 - [启动gdb](#启动gdb)
 - [退出gdb](#退出gdb)
 - [为gdb进行编译](#为gdb进行编译)
-- [装载目标程序](#装载目标程序)
+- [调试程序](#调试程序)
+- [调试core文件](#调试core文件)
+
 
 ## 原理
 断点功能一般是通过特定的内核信号实现的，gdb捕获该信号，定位目标程序停止的地址来判断断点是否成功触发。
@@ -52,11 +54,11 @@
 具体参考[gdb手册](https://sourceware.org/gdb/current/onlinedocs/gdb/Compilation.html#Compilation)
 
 ## 调试程序
-1 一般调试:
 
 ```c 
     //boom.c
     #include <stdio.h>
+    #include <unistd.h>
 
     void fun(void)
     {
@@ -66,9 +68,13 @@
     int main()
     {
         fun();
+        sleep(1000);
         return 0;
     }
 ```
+
+1 直接启动:
+
 方法1
 
     $ gdb boom -q
@@ -81,10 +87,34 @@
     Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
     (gdb)
    
+具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Invoking-GDB.html#Invoking-GDB)
  
 
 2 调试正在运行的程序:
     
-## 调试core dump文件
+    $ ps ux | grep boom | grep -v 'grep' 
+    dan       5647  0.0  0.0  11520   472 pts/0    S+   15:31   0:00 ./boom
+    
+    
+    $ gdb boom 5647 -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    Attaching to program: /home/dan/work/learn_core/build/bin/boom, process 5647
+    Reading symbols from /lib64/libpthread.so.0...(no debugging symbols found)...done.
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    Loaded symbols for /lib64/libpthread.so.0
+    Reading symbols from /lib64/libdl.so.2...(no debugging symbols found)...done.
+    Loaded symbols for /lib64/libdl.so.2
+    Reading symbols from /lib64/libm.so.6...(no debugging symbols found)...done.
+    Loaded symbols for /lib64/libm.so.6
+    Reading symbols from /lib64/libc.so.6...(no debugging symbols found)...done.
+    Loaded symbols for /lib64/libc.so.6
+    Reading symbols from /lib64/ld-linux-x86-64.so.2...(no debugging symbols found)...done.
+    Loaded symbols for /lib64/ld-linux-x86-64.so.2
+    0x00007f1e2185be10 in __nanosleep_nocancel () from /lib64/libc.so.6
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) 
+    
+## 调试core文件
 
 
