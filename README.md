@@ -528,6 +528,23 @@ int main()
 ## 查看断点
 查看全部设置的断点，命令缩写成 i b，例如:
     
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+
     $ gdb boom -q
     Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
     (gdb) list 1,20
@@ -545,14 +562,31 @@ int main()
     12          a++;
     13          return 0;
     14      }
-(gdb) b 5
-Breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
-(gdb) info break
-Num     Type           Disp Enb Address            What
-1       breakpoint     keep y   0x0000000000400731 in func at /home/dan/work/learn_core/boom.c:5
-(gdb) 
+    (gdb) b 5
+    Breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) info break
+    Num     Type           Disp Enb Address            What
+    1       breakpoint     keep y   0x0000000000400731 in func at /home/dan/work/learn_core/boom.c:5
+    (gdb) 
 
 ## 删除断点
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
 
     $ gdb boom -q
     Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
