@@ -12,6 +12,11 @@
 - [CoreDump简单概念](#CoreDump简单概念)
 - [产生CoreDump文件](#产生CoreDump文件)
 - [调试CoreDump文件](#调试CoreDump文件)
+- [调试CoreDump文件](#调试CoreDump文件)
+- [help命令](help命令)
+- [list命令](list命令)
+- [start命令](start命令)
+- [run命令](run命令)
 
 
 ## 原理
@@ -222,4 +227,120 @@ int main()
     Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
     (gdb) 
     
+## help命令
+简写为h，查询命令帮助手册，例如:
 
+    $ gdb -q
+    (gdb) help start
+    Run the debugged program until the beginning of the main procedure.
+    You may specify arguments to give to your program, just as with the
+    "run" command.
+    (gdb) 
+
+## start命令
+start命令会给main函数的第一个可执行语句打上临时断点，然后运行程序直到该断点，例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+    
+    gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) start
+    Temporary breakpoint 1 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 1, main () at /home/dan/work/learn_core/boom.c:10
+    10          int a = 0;
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) 
+    
+# list命令
+简写为l，查看源代码，例如:
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+list num 指定行号
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) l 7
+    
+    void func()
+    {
+        printf("here");
+    }
+
+
+    int main()
+    {
+        int a = 0;
+ 
+ list function 指定函数名
+ 
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) list func
+    #include <stdio.h>
+
+    void func()
+    {
+        printf("here");
+    }
+
+    int main()
+    {
+        int a = 0;
+    (gdb) 
+    
+ list start,end 指定范围
+ 
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) list 1,22
+    #include <stdio.h>
+
+    void func()
+    {
+        printf("here");
+    }
+
+    int main()
+    {
+        int a = 0;
+        func();
+        a++;
+        return 0;
+    }
+    (gdb) 
+ 
+ list + 向后打印
+ list - 向前打印
