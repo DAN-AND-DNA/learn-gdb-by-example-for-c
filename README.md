@@ -125,9 +125,11 @@ int main()
 具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Invoking-GDB.html#Invoking-GDB)
 
 ## CoreDump简单概念
+
 CoreDump即核心转储，是程序运行异常崩溃时，系统内核为该程序产生的内存、寄存器、运行栈等快照，并保存为一个二进制文件，可以利用该文件进行GDB调试，发现运行错误。
     
-## 产生CoreDump文件    
+## 产生CoreDump文件  
+
 查看系统是否已经开启了该功能:
     
     $ ulimit -c
@@ -164,7 +166,7 @@ int main()
     sleep(1000);
     return 0;
 }
- ```
+```
 运行上述程序就会产生core dump 文件，如果修了core dump文件的位置就需要加上绝对地址如:
     
 方法1
@@ -229,7 +231,9 @@ int main()
     Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
     (gdb) 
     
+    
 ## help命令
+
 简写为h，查询命令帮助手册，例如:
 
     $ gdb -q
@@ -241,6 +245,7 @@ int main()
 
 
 ## list命令
+
 简写为l，查看源代码，例如:
 ```c
 #include <stdio.h>
@@ -316,6 +321,7 @@ list num 指定行号
  list - 向前打印
  
 ## start命令
+
 start命令会给main函数的第一个可执行语句打上临时断点，然后运行程序直到该断点，例如:
 
 ```c
@@ -349,6 +355,7 @@ int main()
     (gdb) 
     
 ## next命令
+
 简写为n，继续运行到下一个代码行，遇到函数则直接运行函数，例如:
 
 ```c
