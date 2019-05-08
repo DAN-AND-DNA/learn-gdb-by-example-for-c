@@ -6,6 +6,7 @@
 
 - [原理](#原理)
 - [启动gdb](#启动gdb)
+- [退出gdb](#退出gdb)
 - [装载目标程序](#装载目标程序)
 
 ## 原理
@@ -14,8 +15,7 @@
 父进程捕获该子进程的所有的信号(通过ptrace() 和 wait())，当子进程收到信号时，子进程就会被挂起，直到父进程通知其继续运行(通过ptrace())
 
 ## 启动gdb
-### 常规启动
-非常多的提示信息:
+1 常规启动，非常多的提示信息:
 
     $ gdb
     GNU gdb (GDB) Red Hat Enterprise Linux 7.6.1-114.el7
@@ -29,10 +29,22 @@
     <http://www.gnu.org/software/gdb/bugs/>.
     (gdb)
     
-### 简约启动
-关闭提示信息:
+2 简约启动，关闭提示信息:
 
     $ gdb -q
     (gdb)
 
+## 退出gdb
+1 输入quit:
+
+    $ gdb -q
+    (gdb) quit
+
+2 输入Ctrl-d:
+
+    $ gdb -q
+    (gdb) quit
+    
 ## 装载目标程序
+
+
