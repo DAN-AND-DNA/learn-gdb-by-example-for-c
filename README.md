@@ -237,40 +237,8 @@ int main()
     "run" command.
     (gdb) 
 
-## start命令
-start命令会给main函数的第一个可执行语句打上临时断点，然后运行程序直到该断点，例如:
 
-```c
-#include <stdio.h>
- 
-void func()
-{
-    printf("here");
-}
-      
-int main()
-{
-    int a = 0;
-    func();
-    a++;
-    return 0;
-}
-```
-    
-    gdb boom -q
-    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
-    (gdb) start
-    Temporary breakpoint 1 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
-    Starting program: /home/dan/work/learn_core/build/bin/boom 
-    [Thread debugging using libthread_db enabled]
-    Using host libthread_db library "/lib64/libthread_db.so.1".
-
-    Temporary breakpoint 1, main () at /home/dan/work/learn_core/boom.c:10
-    10          int a = 0;
-    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
-    (gdb) 
-    
-# list命令
+## list命令
 简写为l，查看源代码，例如:
 ```c
 #include <stdio.h>
@@ -344,3 +312,37 @@ list num 指定行号
  
  list + 向后打印
  list - 向前打印
+ 
+## start命令
+start命令会给main函数的第一个可执行语句打上临时断点，然后运行程序直到该断点，例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+    
+    gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) start
+    Temporary breakpoint 1 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 1, main () at /home/dan/work/learn_core/boom.c:10
+    10          int a = 0;
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) 
+    
