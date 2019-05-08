@@ -12,13 +12,17 @@
 - [CoreDump简单概念](#CoreDump简单概念)
 - [产生CoreDump文件](#产生CoreDump文件)
 - [调试CoreDump文件](#调试CoreDump文件)
-- [help命令](help命令)
-- [list命令](list命令)
-- [start命令](start命令)
-- [next命令](next命令)
-- [step命令](next命令)
-- [backtrace命令](backtrace命令)
-- [run命令](run命令)
+- [help命令](#help命令)
+- [list命令](#list命令)
+- [start命令](#start命令)
+- [next命令](#next命令)
+- [step命令](#step命令)
+- [break命令](#break命令)
+- [查看断点](#查看断点)
+- [删除断点](#删除断点)
+- [tbreak命令](#tbreak命令)
+- [backtrace命令](#backtrace命令)
+- [run命令](#run命令)
 
 
 ## 原理
@@ -415,4 +419,203 @@ next num 可以指定连续运行的代码行数量，例如:
     10          int a = 0;
     (gdb) n 3
     13          return 0;
+    (gdb) 
+    
+## step命令
+
+简写为s，继续运行到下一个代码行，遇到函数则进入函数，例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) start
+    Temporary breakpoint 1 at 0x40074a: file /home/dan/work/learn_core/boom.c, line 10.
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 1, main () at /home/dan/work/learn_core/boom.c:10
+    10          int a = 0;
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) step
+    11          func();
+    (gdb) 
+    func () at /home/dan/work/learn_core/boom.c:5
+    5           printf("here");
+    (gdb) 
+    6       }
+    (gdb) 
+    main () at /home/dan/work/learn_core/boom.c:12
+    12          a++;
+    (gdb) 
+    13          return 0;
+    (gdb) 
+    14      }
+    (gdb) 
+    0x00007ffff730e3d5 in __libc_start_main () from /lib64/libc.so.6
+    (gdb) 
+    Single stepping until exit from function __libc_start_main,
+    which has no line number information.
+    here[Inferior 1 (process 6252) exited normally]
+    (gdb) 
+
+## break命令
+简写为b，设置断点，程序运行到断点就会暂停挂起，例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+
+    gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) list 1,20
+    1       #include <stdio.h>
+    2
+    3       void func()
+    4       {
+    5           printf("here");
+    6       }
+    7
+    8       int main()
+    9       {
+    10          int a = 0;
+    11          func();
+    12          a++;
+    13          return 0;
+    14      }
+    (gdb) b 5
+    Breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) run
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Breakpoint 1, func () at /home/dan/work/learn_core/boom.c:5
+    5           printf("here");
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) 
+    
+## 查看断点
+查看全部设置的断点，命令缩写成 i b，例如:
+    
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) list 1,20
+    1       #include <stdio.h>
+    2
+    3       void func()
+    4       {
+    5           printf("here");
+    6       }
+    7
+    8       int main()
+    9       {
+    10          int a = 0;
+    11          func();
+    12          a++;
+    13          return 0;
+    14      }
+(gdb) b 5
+Breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
+(gdb) info break
+Num     Type           Disp Enb Address            What
+1       breakpoint     keep y   0x0000000000400731 in func at /home/dan/work/learn_core/boom.c:5
+(gdb) 
+
+## 删除断点
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) list 1,20
+    1       #include <stdio.h>
+    2
+    3       void func()
+    4       {
+    5           printf("here");
+    6       }
+    7
+    8       int main()
+    9       {
+    10          int a = 0;
+    11          func();
+    12          a++;
+    13          return 0;
+    14      }
+    (gdb) b 5
+    Breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) info break
+    Num     Type           Disp Enb Address            What
+    1       breakpoint     keep y   0x0000000000400731 in func at /home/dan/work/learn_core/boom.c:5
+    (gdb) delete 1
+    (gdb) info break
+    No breakpoints or watchpoints.
+    (gdb) 
+
+## tbreak命令
+设置临时断点，指令简写为ts，该断点一旦触发就会失效例如:
+
+```c
+#include <stdio.h>
+ 
+void func()
+{
+    printf("here");
+}
+      
+int main()
+{
+    int a = 0;
+    func();
+    a++;
+    return 0;
+}
+```
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) tb 5
+    Temporary breakpoint 1 at 0x400731: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) info b
+    Num     Type           Disp Enb Address            What
+    1       breakpoint     del  y   0x0000000000400731 in func at /home/dan/work/learn_core/boom.c:5
+    (gdb) run
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Temporary breakpoint 1, func () at /home/dan/work/learn_core/boom.c:5
+    5           printf("here");
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) info b
+    No breakpoints or watchpoints.
     (gdb) 
