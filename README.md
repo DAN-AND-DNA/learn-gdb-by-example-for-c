@@ -7,6 +7,7 @@
 - [原理](#原理)
 - [启动gdb](#启动gdb)
 - [退出gdb](#退出gdb)
+- [为gdb进行编译](#为gdb进行编译)
 - [装载目标程序](#装载目标程序)
 
 ## 原理
@@ -44,7 +45,46 @@
 
     $ gdb -q
     (gdb) quit
+
+## 为gdb进行编译
+
+    为了获得调试信息，需要添加 CFLAGS=-g -o0 选项
+具体参考[gdb手册](https://sourceware.org/gdb/current/onlinedocs/gdb/Compilation.html#Compilation)
+
+## 调试程序
+1 一般调试:
+
+```c 
+    //boom.c
+    #include <stdio.h>
+
+    void fun(void)
+    {
+         printf("hello\n");
+    }
     
-## 装载目标程序
+    int main()
+    {
+        fun();
+        return 0;
+    }
+```
+方法1
+
+    $ gdb boom -q
+    (gdb) 
+
+方法2
+
+    $ gdb -q
+    (gdb) file boom 
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb)
+   
+ 
+
+2 调试正在运行的程序:
+    
+## 调试core dump文件
 
 
