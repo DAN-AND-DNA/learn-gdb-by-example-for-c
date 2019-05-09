@@ -1170,7 +1170,7 @@ int main()
     (gdb) 
 
 
-## 查看线程运行情况
+## 查看线程运行
 
 ```c
 #include <stdio.h>
