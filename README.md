@@ -22,6 +22,7 @@
 - [查看断点](#查看断点)
 - [删除断点](#删除断点)
 - [tbreak命令](#tbreak命令)
+- [continue命令](#continue命令)
 - [backtrace命令](#backtrace命令)
 - [查看当前所处的函数堆栈帧](#查看当前所处的函数堆栈帧)
 - [选择函数堆栈帧](#选择函数堆栈帧)
@@ -658,6 +659,64 @@ int main()
     No breakpoints or watchpoints.
     (gdb)
     
+## continue命令
+遇到断点可以选择next，step等命令继续运行到下一个代码行，也可以使用continue，继续运行整个程序，例如:
+
+```c
+#include <stdio.h>
+ 
+void func3()
+{
+    int d = 4;
+    printf("d=%d\n", d);
+}
+
+void func2()
+{
+    int c = 3;
+    printf("c=%d\n", c);
+    func3();
+}
+ 
+void func1()
+{
+    int b = 2;
+    printf("b=%d\n", b);
+    func2();
+}
+
+int main()
+{
+    int a  = 1;
+    printf("a=%d\n", a);
+    func1();
+    return 0;
+}
+```
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) b 5
+    Breakpoint 1 at 0x400775: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    a=1
+    b=2
+    c=3
+
+    Breakpoint 1, func3 () at /home/dan/work/learn_core/boom.c:5
+    5           int d = 4;
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) c
+    Continuing.
+    d=4
+    [Inferior 1 (process 4209) exited normally]
+    (gdb) 
+    
+    
+    
 ## backtrace命令
 打印函数堆栈帧，回溯整个调用过程，之类简写为bt，例如:
 
@@ -929,3 +988,65 @@ int main()
     (gdb) info locals
     c = 3
     (gdb) 
+
+
+## run命令
+简写为 r，直接运行程序直到发生错误或者遇到断点，和start不同的是，不会在第一个可执行点暂停，例如:
+```c
+#include <stdio.h>
+
+void func3()
+{
+    int d = 4;
+    printf("d=%d\n", d);
+}
+
+void func2()
+{
+    int c = 3;
+    printf("c=%d\n", c);
+    func3();
+}
+
+void func1()
+{
+    int b = 2;
+    printf("b=%d\n", b);
+    func2();
+}
+
+int main()
+{
+    int a  = 1;
+    printf("a=%d\n", a);
+    func1();
+    return 0;
+}
+```
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    a=1
+    b=2
+    c=3
+    d=4
+    [Inferior 1 (process 4201) exited normally]
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) b 5
+    Breakpoint 1 at 0x400775: file /home/dan/work/learn_core/boom.c, line 5.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    a=1
+    b=2
+    c=3
+
+    Breakpoint 1, func3 () at /home/dan/work/learn_core/boom.c:5
+    5           int d = 4;
+    (gdb) 
+
