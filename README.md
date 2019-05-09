@@ -30,6 +30,7 @@
 - [run命令](#run命令)
 - [修改变量值](#修改变量值)
 - [查看变量类型](#查看变量类型)
+- [查看线程运行](#查看线程运行)
 
 
 ## 原理
@@ -533,7 +534,7 @@ int main()
     (gdb) 
     
 ## 查看断点
-查看全部设置的断点，命令缩写成 i b，例如:
+info breakpoints 可以查看全部设置的断点，命令缩写成 i b，例如:
     
 ```c
 #include <stdio.h>
@@ -1167,3 +1168,64 @@ int main()
         int age;
     }
     (gdb) 
+
+
+## 查看线程运行情况
+info threads 可以查看全部的线程运行情况，包括线程的id和系统id以及当前栈， info thread ID 可以查看单独的线程的运行情况。
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) b 23
+    Breakpoint 1 at 0x40080b: file /home/dan/work/learn_core/boom.c, line 23.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    [New Thread 0x7ffff72eb700 (LWP 4675)]
+    [New Thread 0x7ffff6aea700 (LWP 4676)]
+
+    Breakpoint 1, main () at /home/dan/work/learn_core/boom.c:23
+    23          sleep(100);
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) i threads
+    Id   Target Id         Frame 
+    3    Thread 0x7ffff6aea700 (LWP 4676) "boom" 0x00007ffff73b0e2d in nanosleep () from /lib64/libc.so.6
+    2    Thread 0x7ffff72eb700 (LWP 4675) "boom" 0x00007ffff73b0e2d in nanosleep () from /lib64/libc.so.6
+    * 1    Thread 0x7ffff7fee740 (LWP 4671) "boom" main () at /home/dan/work/learn_core/boom.c:23
+    (gdb) 
+    
+thread apply ID bt 命令可以打印 指定线程的调用栈
+
+    (gdb) thread apply 3 bt
+
+    Thread 3 (Thread 0x7ffff6aea700 (LWP 4676)):
+    #0  0x00007ffff73b0e2d in nanosleep () from /lib64/libc.so.6
+    #1  0x00007ffff73b0cc4 in sleep () from /lib64/libc.so.6
+    #2  0x00000000004007b3 in func (p_arg=0x7fffffffe3b0) at /home/dan/work/learn_core/boom.c:10
+    #3  0x00007ffff7bc6dd5 in start_thread () from /lib64/libpthread.so.0
+    #4  0x00007ffff73e9ead in clone () from /lib64/libc.so.6
+
+thread apply all bt 命令可以打印 全部线程的调用栈
+
+    (gdb) thread apply all bt
+
+    Thread 3 (Thread 0x7ffff6aea700 (LWP 4676)):
+    #0  0x00007ffff73b0e2d in nanosleep () from /lib64/libc.so.6
+    #1  0x00007ffff73b0cc4 in sleep () from /lib64/libc.so.6
+    #2  0x00000000004007b3 in func (p_arg=0x7fffffffe3b0) at /home/dan/work/learn_core/boom.c:10
+    #3  0x00007ffff7bc6dd5 in start_thread () from /lib64/libpthread.so.0
+    #4  0x00007ffff73e9ead in clone () from /lib64/libc.so.6
+
+    Thread 2 (Thread 0x7ffff72eb700 (LWP 4675)):
+    #0  0x00007ffff73b0e2d in nanosleep () from /lib64/libc.so.6
+    #1  0x00007ffff73b0cc4 in sleep () from /lib64/libc.so.6
+    #2  0x00000000004007b3 in func (p_arg=0x7fffffffe3c0) at /home/dan/work/learn_core/boom.c:10
+    #3  0x00007ffff7bc6dd5 in start_thread () from /lib64/libpthread.so.0
+    #4  0x00007ffff73e9ead in clone () from /lib64/libc.so.6
+
+    Thread 1 (Thread 0x7ffff7fee740 (LWP 4671)):
+    #0  main () at /home/dan/work/learn_core/boom.c:23
+    (gdb)  
+ 
+    
+具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Threads.html)
