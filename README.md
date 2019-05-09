@@ -31,6 +31,7 @@
 - [修改变量值](#修改变量值)
 - [查看变量类型](#查看变量类型)
 - [查看线程运行](#查看线程运行)
+- [启动图像界面](#启动图像界面)
 
 
 ## 原理
@@ -1258,3 +1259,10 @@ thread apply all bt 命令可以打印 全部线程的调用栈
  
     
 具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/Threads.html)
+
+
+## 启动图像界面
+
+$ gdb boom -tui -q启动图像界面
+
+具体参考[gdb手册](https://sourceware.org/gdb/onlinedocs/gdb/TUI.html)
