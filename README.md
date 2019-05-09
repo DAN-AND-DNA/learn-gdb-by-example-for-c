@@ -1,6 +1,6 @@
 # GDB 教程
 
-本人做服务器开发，看日志和重审代码可以解决90%的bug，前者而且可以打印调用栈，剩下的很多问题要依赖工具，比如gdb，gdb查看崩溃时的core也是极好。
+本人做服务器开发，看日志和重审代码可以解决90%左右的问题，前者而且可以打印调用栈，剩下的很多问题要依赖工具，比如gdb，gdb查看崩溃时的core也是极好。
 写这个目的就是给想要快速入门gdb的同学的，如果要深入理解gdb，还是要从源码入手才行。
 
 ## 内容
@@ -34,7 +34,7 @@
 
 
 ## 原理
-断点功能一般是通过特定的内核信号实现的，gdb捕获该信号，定位目标程序停止的地址来判断断点是否成功触发。
+断点功能一般是通过gdb捕获特定的内核信号来实现的，然后定位目标程序停止的地址来判断断点是否成功触发。大致的流程为，
 首先gdb fork()出来一个子进程，该子进程启动目标程序(通过ptrace() 和 exec())，
 父进程捕获该子进程的所有的信号(通过ptrace() 和 wait())，当子进程收到信号时，子进程就会被挂起，直到父进程通知其继续运行(通过ptrace())
 
@@ -1171,6 +1171,35 @@ int main()
 
 
 ## 查看线程运行情况
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+
+
+void* func(void *p_arg)
+{
+    while(1)
+    {
+        sleep(3);
+    }
+}
+
+int main()
+{
+    pthread_t t1;
+    pthread_t t2;
+    char t1n[] = "t1";
+    char t2n[] = "t2";
+
+    pthread_create(&t1, NULL, func, t1n);
+    pthread_create(&t2, NULL, func, t2n);
+    sleep(100);
+    return 0;
+}
+```
+
 info threads 可以查看全部的线程运行情况，包括线程的id和系统id以及当前栈， info thread ID 可以查看单独的线程的运行情况。
 
     $ gdb boom -q
