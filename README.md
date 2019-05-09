@@ -28,6 +28,8 @@
 - [选择函数堆栈帧](#选择函数堆栈帧)
 - [打印函数局部变量](#打印函数局部变量)
 - [run命令](#run命令)
+- [修改变量值](#修改变量值)
+- [查看变量类型](#查看变量类型)
 
 
 ## 原理
@@ -846,7 +848,7 @@ int main()
     
 ## 选择函数堆栈帧
 
-通过frame num 可以选择指定的函数堆栈帧，例如:
+通过frame 可以选择指定的函数堆栈帧，该指令缩写为f，例如:
 
 ```c
 #include <stdio.h>
@@ -1050,3 +1052,118 @@ int main()
     5           int d = 4;
     (gdb) 
 
+## 修改变量值
+利用set 命令可以修改程序变量，利用print 可以打印变量的值，缩写为p，例如:
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+void func1()
+{
+    int i = 0;
+
+    while(i < 200)
+    {
+        sleep(1);
+    }
+}
+ 
+int main()
+{
+    func1();
+    return 0;
+}
+ 
+```
+    $ gdb -q
+    (gdb) file boom
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) b 8
+    Breakpoint 1 at 0x40073c: file /home/dan/work/learn_core/boom.c, line 8.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+
+    Breakpoint 1, func1 () at /home/dan/work/learn_core/boom.c:8
+    8           while(i < 200)
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) p i
+    $1 = 0
+    (gdb) set var i = 200
+    (gdb) p i
+    $2 = 200
+    (gdb) s
+    12      }
+    (gdb) 
+    main () at /home/dan/work/learn_core/boom.c:17
+    17          return 0;
+    (gdb) 
+    18      }
+    (gdb) 
+    0x00007ffff730e3d5 in __libc_start_main () from /lib64/libc.so.6
+    (gdb) 
+    Single stepping until exit from function __libc_start_main,
+    which has no line number information.
+    [Inferior 1 (process 4361) exited normally]
+    (gdb) 
+
+要用print打印数组，如果数组的元素数量大于200，是没办法显示完全的，但是可以设置最大元素数量，如:
+
+    set print elements 0    //不进行限制
+    
+    
+## 查看变量类型
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+ 
+
+struct User {
+    char openid[15];
+    int  age;
+};
+
+
+void func1()
+{
+    struct User u = {"wx1234567", 7};
+    printf("openid = %s\n", u.openid);
+    int i = 0;
+
+    while(i < 200)
+    {
+        sleep(1);
+    }
+}
+
+int main()
+{
+    func1();
+    return 0;
+}
+```
+
+
+    $ gdb boom -q
+    Reading symbols from /home/dan/work/learn_core/build/bin/boom...done.
+    (gdb) b 17
+    Breakpoint 1 at 0x4007b8: file /home/dan/work/learn_core/boom.c, line 17.
+    (gdb) r
+    Starting program: /home/dan/work/learn_core/build/bin/boom 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib64/libthread_db.so.1".
+    openid = wx1234567
+
+    Breakpoint 1, func1 () at /home/dan/work/learn_core/boom.c:17
+    warning: Source file is more recent than executable.
+    17          while(i < 200)
+    Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+    (gdb) ptype u
+    type = struct User {
+        char openid[15];
+        int age;
+    }
+    (gdb) 
